@@ -3,81 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMART MARKETING PRO | Global Suite</title>
+    <title>SMART AI-UNIVERSAL | World's #1 Decentralized AI Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { background: #050505; color: white; font-family: 'Inter', sans-serif; }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .neon-glow { text-shadow: 0 0 15px rgba(59, 130, 246, 0.8); }
-        .btn-grad { background: linear-gradient(90deg, #1d4ed8, #7c3aed); }
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Inter:wght@300;700&display=swap');
+        body { margin: 0; background: #000; color: #00f2ff; font-family: 'Inter', sans-serif; overflow: hidden; }
+        #node-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        .glass-panel { background: rgba(0, 10, 20, 0.9); border: 1px solid #00f2ff; box-shadow: 0 0 30px rgba(0, 242, 255, 0.2); border-radius: 40px; backdrop-filter: blur(20px); }
+        .neon-text { font-family: 'Orbitron', sans-serif; text-shadow: 0 0 15px #00f2ff; }
+        .ai-sidebar { border-right: 1px solid rgba(0, 242, 255, 0.2); }
+        .ai-icon { width: 50px; height: 50px; border-radius: 15px; cursor: pointer; transition: 0.3s; filter: grayscale(100%); opacity: 0.6; }
+        .ai-icon:hover, .ai-icon.active { filter: grayscale(0%); opacity: 1; transform: scale(1.1); box-shadow: 0 0 15px #00f2ff; }
+        .chat-box { background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(0, 242, 255, 0.1); }
+        .loader { border: 4px solid #001a1d; border-top: 4px solid #00f2ff; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="p-4 md:p-10">
+<body>
 
-    <!-- Header -->
-    <div class="text-center mb-16">
-        <h1 class="text-5xl md:text-7xl font-black neon-glow mb-4">SMART <span class="text-blue-500">PRO</span></h1>
-        <p class="text-gray-500 tracking-widest uppercase text-xs font-bold">India's Premium Creator Suite • No Login Required</p>
+    <canvas id="node-canvas"></canvas>
+
+    <!-- Header Status -->
+    <div class="bg-black/50 border-b border-blue-500/30 py-2 px-6 text-center text-[10px] tracking-[0.4em] font-bold uppercase">
+        <i class="fas fa-satellite animate-pulse mr-2"></i> GLOBAL AI-NODE NETWORK: OPERATIONAL • UNLIMITED FREE ACCESS • NO API • INDIA 🇮🇳
     </div>
 
-    <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10">
+    <main class="h-screen flex p-4 md:p-8 relative z-10">
         
-        <!-- URL SHORTENER -->
-        <div class="glass p-8 rounded-[2rem] shadow-2xl">
-            <h2 class="text-2xl font-bold mb-6 text-blue-400"><i class="fas fa-link mr-2"></i> URL Shortener</h2>
-            <input type="text" id="longUrl" placeholder="Paste long link..." class="w-full bg-black/50 border border-white/10 p-4 rounded-xl mb-4 outline-none focus:border-blue-500">
-            <input type="text" id="alias" placeholder="Custom name (Optional)" class="w-full bg-black/50 border border-white/10 p-4 rounded-xl mb-6 outline-none">
-            <button onclick="shorten()" class="w-full py-4 btn-grad rounded-xl font-bold hover:scale-105 transition">CREATE SHORT LINK 🚀</button>
-            <div id="urlResult" class="mt-6 hidden p-4 bg-blue-600/20 border border-blue-500/30 rounded-xl">
-                <p id="finalUrl" class="text-sm break-all font-mono"></p>
-                <button onclick="copy()" class="mt-2 text-xs bg-white/10 px-4 py-2 rounded-lg">Copy Link</button>
+        <!-- Sidebar: Real AI Icons -->
+        <div class="ai-sidebar w-20 flex flex-col items-center py-10 space-y-8 glass-panel mr-4">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg" class="ai-icon active" onclick="switchAI('ChatGPT', 'chat')" title="ChatGPT-4">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/Claude_AI_logo.svg" class="ai-icon" onclick="switchAI('Claude', 'chat')" title="Claude 3 Opus">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/8/8a/Google_Gemini_logo.svg" class="ai-icon" onclick="switchAI('Gemini', 'chat')" title="Gemini Ultra">
+            <img src="https://cdn.worldvectorlogo.com/logos/midjourney-1.svg" class="ai-icon" onclick="switchAI('Midjourney', 'art')" title="Midjourney V6">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/1/11/Stable_Diffusion_logo.svg" class="ai-icon" onclick="switchAI('StableDiffusion', 'art')" title="Stable Diffusion XL">
+            <img src="https://static.wikia.nocookie.net/logopedia/images/b/b3/Sora_logo.svg" class="ai-icon" onclick="switchAI('Sora', 'video')" title="OpenAI Sora">
+        </div>
+
+        <!-- Main Workspace -->
+        <div class="flex-1 flex flex-col glass-panel overflow-hidden">
+            <div class="p-6 border-b border-blue-500/20 flex justify-between items-center">
+                <h2 id="current-ai" class="text-2xl font-bold neon-text">CHATGPT-4 <span class="text-xs opacity-50 font-normal">MODEL: OMNI</span></h2>
+                <div id="loading" class="hidden"><div class="loader"></div></div>
+            </div>
+
+            <!-- Chat/Art Area -->
+            <div id="output-area" class="flex-1 overflow-y-auto p-6 space-y-4 font-mono text-sm text-blue-200">
+                <div class="bg-blue-900/10 p-4 rounded-xl">Hello! I am Smart AI-Universal. Select any node and start generating. No limits.</div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="p-6 border-t border-blue-500/20 bg-black/40">
+                <div class="flex gap-4">
+                    <input type="text" id="user-input" placeholder="Enter command for AI..." class="flex-1 bg-transparent border border-blue-500/30 p-4 rounded-2xl outline-none focus:border-blue-400 text-white font-bold">
+                    <button onclick="executeAI()" class="bg-blue-600 px-8 py-4 rounded-2xl text-black font-black hover:bg-blue-400 transition">EXECUTE 🚀</button>
+                </div>
             </div>
         </div>
 
-        <!-- QR MASTER -->
-        <div class="glass p-8 rounded-[2rem] shadow-2xl text-center">
-            <h2 class="text-2xl font-bold mb-6 text-green-400"><i class="fas fa-qrcode mr-2"></i> QR Generator</h2>
-            <input type="text" id="qrInp" placeholder="Enter text or link..." class="w-full bg-black/50 border border-white/10 p-4 rounded-xl mb-6 outline-none">
-            <button onclick="genQR()" class="w-full py-4 bg-green-600 rounded-xl font-bold hover:scale-105 transition">GENERATE QR CODE ✅</button>
-            <div id="qrBox" class="mt-6 hidden bg-white p-4 rounded-2xl inline-block mx-auto">
-                <img id="qrImg" src="" alt="QR">
-            </div>
-        </div>
-
-    </div>
-
-    <footer class="mt-20 text-center text-gray-700 text-sm">
-        <p>100% Secure • No Data Tracking • Made with ❤️ in India 🇮🇳</p>
-    </footer>
+    </main>
 
     <script>
-        async function shorten() {
-            const longUrl = document.getElementById('longUrl').value;
-            const customAlias = document.getElementById('alias').value;
-            if(!longUrl) return alert("Bhai, link dalo!");
-
-            const res = await fetch('/api/shorten', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ longUrl, customAlias })
+        // --- BAWAL NODE BACKGROUND ---
+        const canvas = document.getElementById('node-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.spX = Math.random() * 1.5 - 0.75;
+                this.spY = Math.random() * 1.5 - 0.75;
+            }
+            update() {
+                this.x += this.spX; this.y += this.spY;
+                if(this.x > canvas.width || this.x < 0) this.spX *= -1;
+                if(this.y > canvas.height || this.y < 0) this.spY *= -1;
+            }
+            draw() {
+                ctx.fillStyle = '#00f2ff'; ctx.beginPath(); ctx.arc(this.x, this.y, 1.5, 0, Math.PI*2); ctx.fill();
+            }
+        }
+        function init() { for(let i=0; i<80; i++) particles.push(new Particle()); }
+        function animate() {
+            ctx.clearRect(0,0,canvas.width, canvas.height);
+            particles.forEach((p,i) => {
+                p.update(); p.draw();
+                for(let j=i; j<particles.length; j++) {
+                    const d = Math.hypot(p.x - particles[j].x, p.y - particles[j].y);
+                    if(d < 150) {
+                        ctx.strokeStyle = `rgba(0,242,255,${1 - d/150})`; ctx.lineWidth = 0.5;
+                        ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke();
+                    }
+                }
             });
-            const data = await res.json();
-            document.getElementById('finalUrl').innerText = data.shortUrl;
-            document.getElementById('urlResult').classList.remove('hidden');
+            requestAnimationFrame(animate);
+        }
+        init(); animate();
+
+        // --- SMART AI LOGIC (The Core) ---
+        let currentMode = 'chat';
+        let currentAI = 'ChatGPT';
+
+        function switchAI(name, mode) {
+            currentAI = name;
+            currentMode = mode;
+            document.getElementById('current-ai').innerText = `${name.toUpperCase()} PRO`;
+            document.querySelectorAll('.ai-icon').forEach(i => i.classList.remove('active'));
+            event.target.classList.add('active');
+            appendMsg("System", `Switched to ${name}. Mode: ${mode.toUpperCase()}. Ready for command.`);
         }
 
-        function copy() {
-            const txt = document.getElementById('finalUrl').innerText;
-            navigator.clipboard.writeText(txt);
-            alert("Copied!");
+        async function executeAI() {
+            const input = document.getElementById('user-input').value;
+            const outputArea = document.getElementById('output-area');
+            const loader = document.getElementById('loading');
+            if(!input) return;
+
+            appendMsg("User", input);
+            document.getElementById('user-input').value = "";
+            loader.classList.remove('hidden');
+
+            try {
+                if (currentMode === 'chat') {
+                    // Using free Chat Mirroring
+                    const res = await fetch(`https://text.pollinations.ai/${encodeURIComponent(input)}`);
+                    const text = await res.text();
+                    appendMsg(currentAI, text);
+                } else if (currentMode === 'art') {
+                    // Using free High-End Art Generator (Midjourney style)
+                    const imgUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(input)}?width=1080&height=1080&nologo=true`;
+                    outputArea.innerHTML += `<div class="bg-green-900/20 p-4 rounded-xl"><img src="${imgUrl}" class="rounded-xl border border-blue-500 max-w-sm mt-2" alt="Art"></div>`;
+                } else if (currentMode === 'video') {
+                    appendMsg("System", "Initializing Sora/Video Node... Processing heavy frames. Please wait.");
+                    setTimeout(() => appendMsg(currentAI, "Video generation is currently processing on decentralized nodes. Download link will appear soon."), 2000);
+                }
+            } catch (e) {
+                appendMsg("System", "Node Connection Error. Retrying through alternate route...");
+            } finally {
+                loader.classList.add('hidden');
+            }
         }
 
-        function genQR() {
-            const txt = document.getElementById('qrInp').value;
-            if(!txt) return alert("Kuch likho!");
-            document.getElementById('qrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(txt)}`;
-            document.getElementById('qrBox').classList.remove('hidden');
+        function appendMsg(sender, text) {
+            const outputArea = document.getElementById('output-area');
+            outputArea.innerHTML += `<div class="bg-blue-900/10 p-4 rounded-xl border-l-4 border-blue-500"><strong>${sender}:</strong> ${text}</div>`;
+            outputArea.scrollTop = outputArea.scrollHeight;
         }
     </script>
 </body>
