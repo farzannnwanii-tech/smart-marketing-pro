@@ -1,83 +1,89 @@
-<!-- Is code mein maine URL Shorten aur QR Code ka asli kaam dal diya hai -->
+<!-- Ismein Maine "Custom Alias" aur "Copy Button" add kar diya hai -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMART MARKETING PRO | Global Creator Suite</title>
+    <title>SMART MARKETING PRO | India's #1 Suite</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #050505; color: white; scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; background-color: #050505; color: white; }
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .hero-gradient { background: radial-gradient(circle at center, #1e3a8a 0%, #050505 100%); }
+        .btn-blue { background: linear-gradient(90deg, #2563eb, #7c3aed); }
     </style>
 </head>
-<body>
+<body class="p-4">
 
-    <div class="bg-blue-600/20 py-2 text-center text-[10px] tracking-widest uppercase font-bold text-blue-400">
-        🇮🇳 Made In India • No Login • No Tracking • Unlimited Free
+    <div class="max-w-4xl mx-auto mt-10">
+        <h1 class="text-4xl font-black text-center mb-10 text-blue-500">SMART <span class="text-white">MARKETING</span> PRO</h1>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            <!-- URL SHORTENER PRO -->
+            <div class="glass p-8 rounded-3xl">
+                <h3 class="text-2xl font-bold mb-4"><i class="fas fa-link mr-2"></i> URL Shortener</h3>
+                <input type="text" id="longUrl" placeholder="Paste Long URL here..." class="w-full bg-black/50 border border-white/10 p-4 rounded-xl mb-4 outline-none">
+                
+                <!-- CUSTOM ALIAS (Bawal Feature) -->
+                <div class="flex items-center bg-black/50 border border-white/10 rounded-xl mb-4 p-2">
+                    <span class="text-gray-500 text-xs px-2">smart-pro/</span>
+                    <input type="text" id="customAlias" placeholder="custom-name" class="bg-transparent border-none outline-none text-blue-400 w-full">
+                </div>
+
+                <button onclick="shortenUrl()" id="shortBtn" class="w-full py-4 btn-blue rounded-xl font-bold">CREATE BOOM LINK 🚀</button>
+                
+                <div id="result" class="mt-4 hidden p-4 bg-blue-600/20 border border-blue-500/30 rounded-xl relative">
+                    <p class="text-xs text-gray-400 mb-1">Your Short Link:</p>
+                    <p id="shortLinkUrl" class="text-blue-400 font-bold break-all"></p>
+                    <button onclick="copyLink()" class="mt-2 text-[10px] bg-white/10 px-3 py-1 rounded">Copy Link <i class="fas fa-copy"></i></button>
+                </div>
+            </div>
+
+            <!-- QR MASTER -->
+            <div class="glass p-8 rounded-3xl text-center">
+                <h3 class="text-2xl font-bold mb-4 text-green-400"><i class="fas fa-qrcode mr-2"></i> QR Master</h3>
+                <input type="text" id="qrText" placeholder="Link or Text for QR..." class="w-full bg-black/50 border border-white/10 p-4 rounded-xl mb-4 outline-none">
+                <button onclick="generateQR()" class="w-full py-4 bg-green-600 rounded-xl font-bold">GENERATE QR ✅</button>
+                <div id="qrResult" class="mt-4 hidden bg-white p-4 rounded-2xl inline-block mx-auto">
+                    <img id="qrImage" src="" alt="QR">
+                </div>
+            </div>
+
+        </div>
     </div>
 
-    <section class="hero-gradient min-h-screen flex flex-col items-center justify-center px-6 text-center">
-        <h1 class="text-6xl md:text-8xl font-black mb-6 animate__animated animate__fadeInDown">SMART <span class="text-blue-500">MARKETING</span> PRO</h1>
-        <p class="text-gray-400 max-w-2xl mb-10 text-lg">Stop paying for basic tools. Professional, Private, and Permanent.</p>
-        <a href="#tools" class="bg-blue-600 px-10 py-4 rounded-full font-bold hover:scale-105 transition">EXPLORE TOOLS 🚀</a>
-    </section>
-
-    <section id="tools" class="py-20 px-6 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
-        
-        <!-- URL SHORTENER (WORKING) -->
-        <div class="glass p-8 rounded-3xl">
-            <h3 class="text-2xl font-bold mb-4 text-blue-400"><i class="fas fa-link mr-2"></i> URL Shortener</h3>
-            <input type="text" id="longUrl" placeholder="Paste long link here..." class="w-full bg-black/50 border border-white/10 p-4 rounded-xl mb-4 outline-none focus:border-blue-500">
-            <button onclick="shortenUrl()" id="shortBtn" class="w-full py-4 bg-blue-600 rounded-xl font-bold">Shorten Link</button>
-            <div id="result" class="mt-4 hidden p-4 bg-blue-600/20 border border-blue-500/30 rounded-xl break-all"></div>
-        </div>
-
-        <!-- QR GENERATOR (WORKING) -->
-        <div class="glass p-8 rounded-3xl">
-            <h3 class="text-2xl font-bold mb-4 text-green-400"><i class="fas fa-qrcode mr-2"></i> QR Master</h3>
-            <input type="text" id="qrText" placeholder="Enter text or link for QR..." class="w-full bg-black/50 border border-white/10 p-4 rounded-xl mb-4 outline-none focus:border-green-500">
-            <button onclick="generateQR()" class="w-full py-4 bg-green-600 rounded-xl font-bold">Generate QR Code</button>
-            <div id="qrResult" class="mt-4 hidden flex justify-center p-4 bg-white rounded-xl">
-                <img id="qrImage" src="" alt="QR Code">
-            </div>
-        </div>
-
-    </section>
-
     <script>
-        // URL Shortener Logic
         async function shortenUrl() {
             const longUrl = document.getElementById('longUrl').value;
+            const customAlias = document.getElementById('customAlias').value;
             const resultDiv = document.getElementById('result');
-            const btn = document.getElementById('shortBtn');
+            const shortLinkUrl = document.getElementById('shortLinkUrl');
+            
             if(!longUrl) return alert("Bhai, link toh daalo!");
 
-            btn.innerText = "Processing...";
             const response = await fetch('/api/shorten', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ longUrl })
+                body: JSON.stringify({ longUrl, customAlias })
             });
             const data = await response.json();
             
-            resultDiv.innerHTML = `<strong>Short Link:</strong> <a href="${data.shortUrl}" target="_blank" class="text-blue-400 underline">${data.shortUrl}</a>`;
+            shortLinkUrl.innerText = data.shortUrl;
             resultDiv.classList.remove('hidden');
-            btn.innerText = "Shorten Link";
         }
 
-        // QR Code Logic (Using Free API)
-        function generateQR() {
-            const qrText = document.getElementById('qrText').value;
-            const qrResult = document.getElementById('qrResult');
-            const qrImage = document.getElementById('qrImage');
-            if(!qrText) return alert("Bhai, kuch likho toh sahi!");
+        function copyLink() {
+            const link = document.getElementById('shortLinkUrl').innerText;
+            navigator.clipboard.writeText(link);
+            alert("Link Copied! 复制成功");
+        }
 
-            qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrText)}`;
-            qrResult.classList.remove('hidden');
+        function generateQR() {
+            const text = document.getElementById('qrText').value;
+            if(!text) return alert("Kuch toh likho!");
+            document.getElementById('qrImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(text)}`;
+            document.getElementById('qrResult').classList.remove('hidden');
         }
     </script>
 </body>
