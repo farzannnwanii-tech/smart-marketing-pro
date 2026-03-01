@@ -3,165 +3,179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMART AI-NODE | Autonomous AI Hub</title>
+    <title>SMART AI-NODE | World's #1 Universal Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap');
-        body { background: #050505; color: #e5e7eb; font-family: 'Inter', sans-serif; overflow: hidden; }
-        #node-bg { position: fixed; top: 0; left: 0; z-index: -1; width: 100%; height: 100%; opacity: 0.3; }
-        .chat-container { height: calc(100vh - 180px); scrollbar-width: none; }
-        .chat-container::-webkit-scrollbar { display: none; }
-        .glass-header { background: rgba(10, 10, 10, 0.9); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
-        .input-bar { background: rgba(15, 15, 15, 0.95); border-top: 1px solid rgba(255, 255, 255, 0.1); }
-        .ai-msg { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .user-msg { background: rgba(37, 99, 235, 0.2); border: 1px solid rgba(37, 99, 235, 0.3); }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { background: #050505; color: #f3f4f6; font-family: 'Inter', sans-serif; margin: 0; overflow: hidden; }
+        #node-canvas { position: fixed; top: 0; left: 0; z-index: -1; width: 100%; height: 100%; opacity: 0.3; }
+        
+        /* Custom Dropdown Styling */
+        .dropdown-content { display: none; position: absolute; right: 0; top: 50px; background: #0f0f0f; border: 1px solid #333; border-radius: 15px; width: 220px; max-height: 400px; overflow-y: auto; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .dropdown-item { display: flex; items-center: center; gap: 12px; padding: 12px; cursor: pointer; transition: 0.2s; border-bottom: 1px solid #1a1a1a; }
+        .dropdown-item:hover { background: #1a1a1a; }
+        .ai-logo { width: 20px; height: 20px; border-radius: 4px; object-fit: contain; }
+        
+        /* Chat Interface - No Bubbles */
+        .chat-container { height: calc(100vh - 140px); overflow-y: auto; padding: 20px; scroll-behavior: smooth; }
+        .chat-row { margin-bottom: 30px; display: flex; flex-direction: column; }
+        .user-row { align-items: flex-end; }
+        .ai-row { align-items: flex-start; }
+        .msg-text { max-width: 85%; font-size: 15px; line-height: 1.6; color: #d1d5db; }
+        .sender-name { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; color: #6b7280; }
+        
+        .input-bar { background: rgba(5,5,5,0.8); backdrop-filter: blur(10px); border-top: 1px solid #222; }
     </style>
 </head>
 <body>
 
-    <canvas id="node-bg"></canvas>
+    <canvas id="node-canvas"></canvas>
 
-    <!-- Header with Dynamic Model Selector -->
-    <header class="glass-header fixed top-0 w-full z-50 p-4 flex justify-between items-center">
+    <!-- Header -->
+    <header class="fixed top-0 w-full p-4 flex justify-between items-center z-50 border-b border-white/5 bg-black/50 backdrop-blur-md">
         <div class="flex items-center gap-2">
-            <span class="text-blue-500 font-black text-xl tracking-tighter">AI-NODE</span>
-            <span class="text-[10px] bg-blue-600/20 text-blue-400 px-2 py-1 rounded-full font-bold uppercase">Auto-Sync</span>
+            <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+            <span class="font-bold tracking-tighter text-xl">AI<span class="text-blue-500">NODE</span></span>
         </div>
-        
-        <!-- THE DYNAMIC ARROW BUTTON -->
-        <div class="relative group">
-            <select id="modelSelect" class="bg-black border border-white/20 text-white text-[10px] font-bold py-2 pl-4 pr-10 rounded-full outline-none focus:border-blue-500 cursor-pointer uppercase tracking-widest">
-                <option>FETCHING MODELS...</option>
-            </select>
-            <i class="fas fa-chevron-down absolute right-4 top-3 text-[10px] pointer-events-none text-blue-500"></i>
+
+        <!-- THE CUSTOM ARROW DROPDOWN -->
+        <div class="relative">
+            <button onclick="toggleDropdown()" class="bg-[#111] border border-[#333] px-4 py-2 rounded-full flex items-center gap-3 text-xs font-bold hover:border-blue-500 transition">
+                <img id="selected-logo" src="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg" class="w-4 h-4">
+                <span id="selected-name">OPENAI (FAST)</span>
+                <i class="fas fa-chevron-down text-[10px] text-blue-500"></i>
+            </button>
+            <div id="model-list" class="dropdown-content">
+                <!-- Models will load here automatically -->
+            </div>
         </div>
     </header>
 
-    <!-- Chat Interface -->
-    <main id="chatBox" class="chat-container mt-20 p-4 md:p-8 flex flex-col space-y-6 overflow-y-auto w-full max-w-4xl mx-auto">
-        <div class="ai-msg p-5 rounded-3xl max-w-[90%] text-sm leading-relaxed border-l-4 border-blue-600">
-            <strong>System:</strong> Node Intelligence initialized. Models are being synchronized from global servers. No API required. 
+    <!-- Chat Area -->
+    <main id="chat-box" class="chat-container mt-20 max-w-3xl mx-auto">
+        <div class="ai-row chat-row">
+            <span class="sender-name text-blue-500">System</span>
+            <div class="msg-text">Welcome, Commander. Global nodes synchronized. No API required. Start chatting with any model.</div>
         </div>
     </main>
 
-    <!-- Professional Input Bar -->
+    <!-- Input Area -->
     <div class="input-bar fixed bottom-0 w-full p-4 md:p-6">
-        <div class="max-w-4xl mx-auto flex gap-3">
-            <input type="text" id="userInput" placeholder="Ask anything to the Node..." class="flex-1 bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-blue-500 text-sm transition-all">
-            <button onclick="send()" class="bg-blue-600 px-8 py-4 rounded-2xl text-black font-black hover:bg-blue-500 transition shadow-lg shadow-blue-600/20">
+        <div class="max-w-3xl mx-auto flex gap-4">
+            <input type="text" id="userInput" placeholder="Message AI Node..." class="flex-1 bg-transparent border border-[#333] p-4 rounded-xl outline-none focus:border-blue-500 text-sm">
+            <button onclick="sendMsg()" class="bg-blue-600 text-black px-6 rounded-xl font-bold hover:bg-blue-400 transition">
                 <i class="fas fa-paper-plane"></i>
             </button>
         </div>
-        <p class="text-[9px] text-center mt-3 opacity-30 tracking-[0.5em] uppercase">Autonomous AI Hub • 100% Secure • India 🇮🇳</p>
     </div>
 
     <script>
-        // --- 1. DYNAMIC MODEL DISCOVERY (The "Bawal" Node Logic) ---
-        async function fetchModels() {
-            const select = document.getElementById('modelSelect');
+        // --- 1. DYNAMIC MODEL & LOGO FETCHING ---
+        const models_api = "https://text.pollinations.ai/models";
+        let currentModel = "openai";
+
+        const logos = {
+            "openai": "https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg",
+            "mistral": "https://avatars.githubusercontent.com/u/144473551?s=200&v=4",
+            "llama": "https://upload.wikimedia.org/wikipedia/commons/f/ff/Meta_logo_2021.svg",
+            "searchgpt": "https://upload.wikimedia.org/wikipedia/commons/e/e1/Claude_AI_logo.svg",
+            "flux": "https://upload.wikimedia.org/wikipedia/commons/1/11/Stable_Diffusion_logo.svg"
+        };
+
+        async function loadModels() {
+            const list = document.getElementById('model-list');
             try {
-                // Fetching real-time models list from the global node
-                const res = await fetch('https://text.pollinations.ai/models');
+                const res = await fetch(models_api);
                 const models = await res.json();
+                list.innerHTML = ""; // Clear
                 
-                select.innerHTML = ""; // Clear fetching text
                 models.forEach(m => {
-                    const opt = document.createElement('option');
-                    opt.value = m.name;
-                    opt.innerText = `${m.name.toUpperCase()} (ACTIVE)`;
-                    select.appendChild(opt);
+                    const logoUrl = logos[m.name.toLowerCase()] || "https://cdn-icons-png.flaticon.com/512/2103/2103633.png";
+                    const item = document.createElement('div');
+                    item.className = "dropdown-item";
+                    item.innerHTML = `<img src="${logoUrl}" class="ai-logo"> <span class="text-xs font-bold uppercase">${m.name}</span>`;
+                    item.onclick = () => selectModel(m.name, logoUrl);
+                    list.appendChild(item);
                 });
-
-                // Add Image Nodes manually since they are different
-                const imgOpt = document.createElement('option');
-                imgOpt.value = "flux"; imgOpt.innerText = "FLUX PRO (IMAGE)";
-                select.appendChild(imgOpt);
-
-            } catch (e) {
-                select.innerHTML = "<option>ERROR SYNCING MODELS</option>";
-            }
+            } catch (e) { list.innerHTML = "<div class='p-4 text-xs'>Sync Error</div>"; }
         }
-        fetchModels(); // Run on startup
 
-        // --- 2. WORKING CHAT EXECUTION ---
-        async function send() {
-            const input = document.getElementById('userInput').value;
-            const model = document.getElementById('modelSelect').value;
-            const chatBox = document.getElementById('chatBox');
-            if(!input) return;
+        function toggleDropdown() {
+            const d = document.getElementById('model-list');
+            d.style.display = d.style.display === 'block' ? 'none' : 'block';
+        }
 
-            // Append User Message
-            appendMsg('user', input);
-            document.getElementById('userInput').value = '';
+        function selectModel(name, logo) {
+            currentModel = name;
+            document.getElementById('selected-name').innerText = name.toUpperCase();
+            document.getElementById('selected-logo').src = logo;
+            toggleDropdown();
+        }
 
-            // AI Processing Bubble
-            const aiDiv = document.createElement('div');
-            aiDiv.className = 'ai-msg p-5 rounded-3xl max-w-[90%] text-sm border-l-4 border-gray-600 animate-pulse';
-            aiDiv.innerText = `${model} is processing...`;
-            chatBox.appendChild(aiDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
+        // --- 2. CLEAN CHAT LOGIC ---
+        async function sendMsg() {
+            const inp = document.getElementById('userInput');
+            const chat = document.getElementById('chat-box');
+            if(!inp.value) return;
+
+            const text = inp.value;
+            inp.value = "";
+            appendRow('User', text, true);
+
+            const aiRow = appendRow(currentModel, "Thinking...", false);
 
             try {
-                if(model === 'flux') {
-                    const imgUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(input)}?width=1080&height=1080&nologo=true`;
-                    aiDiv.innerHTML = `<img src="${imgUrl}" class="rounded-2xl border border-white/10 max-w-full" alt="AI ART">`;
-                } else {
-                    const res = await fetch(`https://text.pollinations.ai/${encodeURIComponent(input)}?model=${model}`);
-                    const text = await res.text();
-                    aiDiv.classList.remove('animate-pulse');
-                    aiDiv.innerHTML = `<strong>${model.toUpperCase()}:</strong> <br>${text}`;
-                }
-            } catch (e) {
-                aiDiv.innerText = "Error: Node Timeout. Try another model.";
-            }
-            chatBox.scrollTop = chatBox.scrollHeight;
+                const res = await fetch(`https://text.pollinations.ai/${encodeURIComponent(text)}?model=${currentModel}`);
+                const data = await res.text();
+                aiRow.innerText = data;
+            } catch (e) { aiRow.innerText = "Connection lost."; }
+            chat.scrollTop = chat.scrollHeight;
         }
 
-        function appendMsg(sender, text) {
+        function appendRow(sender, text, isUser) {
             const div = document.createElement('div');
-            div.className = sender === 'user' ? 'user-msg p-5 rounded-3xl max-w-[85%] text-sm ml-auto font-bold' : 'ai-msg p-5 rounded-3xl max-w-[90%] text-sm border-l-4 border-blue-600';
-            div.innerHTML = text;
-            chatBox.appendChild(div);
-            chatBox.scrollTop = chatBox.scrollHeight;
+            div.className = `chat-row ${isUser ? 'user-row' : 'ai-row'}`;
+            div.innerHTML = `<span class="sender-name ${isUser ? 'text-gray-500' : 'text-blue-500'}">${sender}</span><div class="msg-text">${text}</div>`;
+            document.getElementById('chat-box').appendChild(div);
+            return div.querySelector('.msg-text');
         }
 
-        // --- BAWAL NODE BACKGROUND ---
-        const canvas = document.getElementById('node-bg');
+        // --- 3. NODE BACKGROUND ---
+        const canvas = document.getElementById('node-canvas');
         const ctx = canvas.getContext('2d');
         let parts = [];
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
         class Part {
             constructor() {
                 this.x = Math.random()*canvas.width; this.y = Math.random()*canvas.height;
-                this.sx = Math.random()*0.4 - 0.2; this.sy = Math.random()*0.4 - 0.2;
+                this.vx = Math.random()*0.6-0.3; this.vy = Math.random()*0.6-0.3;
             }
             draw() {
-                this.x += this.sx; this.y += this.sy;
-                if(this.x<0 || this.x>canvas.width) this.sx*=-1;
-                if(this.y<0 || this.y>canvas.height) this.sy*=-1;
-                ctx.fillStyle = 'rgba(37, 99, 235, 0.4)';
-                ctx.beginPath(); ctx.arc(this.x, this.y, 1, 0, Math.PI*2); ctx.fill();
+                this.x+=this.vx; this.y+=this.vy;
+                if(this.x<0||this.x>canvas.width) this.vx*=-1;
+                if(this.y<0||this.y>canvas.height) this.vy*=-1;
+                ctx.fillStyle='rgba(59,130,246,0.5)'; ctx.beginPath(); ctx.arc(this.x,this.y,1,0,Math.PI*2); ctx.fill();
             }
         }
-        for(let i=0; i<60; i++) parts.push(new Part());
-        function anim() {
+        for(let i=0;i<70;i++) parts.push(new Part());
+        function anim(){
             ctx.clearRect(0,0,canvas.width,canvas.height);
-            parts.forEach((p,i) => {
+            parts.forEach((p,i)=>{
                 p.draw();
-                for(let j=i; j<parts.length; j++) {
-                    let d = Math.hypot(p.x-parts[j].x, p.y-parts[j].y);
-                    if(d<100) {
-                        ctx.strokeStyle = `rgba(37, 99, 235, ${0.15 - d/700})`;
-                        ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(parts[j].x,parts[j].y); ctx.stroke();
+                for(let j=i;j<parts.length;j++){
+                    let d=Math.hypot(p.x-parts[j].x, p.y-parts[j].y);
+                    if(d<120){
+                        ctx.strokeStyle=`rgba(59,130,246,${0.2-d/600})`;
+                        ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(parts[j].x,parts[j].y);ctx.stroke();
                     }
                 }
             });
             requestAnimationFrame(anim);
         }
         anim();
-
-        document.getElementById('userInput').addEventListener('keypress', (e) => { if(e.key === 'Enter') send(); });
+        loadModels();
+        window.onclick = (e) => { if(!e.target.closest('.relative')) document.getElementById('model-list').style.display='none'; }
     </script>
 </body>
 </html>
