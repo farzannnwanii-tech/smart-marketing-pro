@@ -3,179 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMART AI-NODE | World's #1 Universal Hub</title>
+    <title>SMART AI-ARENA | India's Universal AI Node</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-        body { background: #050505; color: #f3f4f6; font-family: 'Inter', sans-serif; margin: 0; overflow: hidden; }
-        #node-canvas { position: fixed; top: 0; left: 0; z-index: -1; width: 100%; height: 100%; opacity: 0.3; }
+        body { background: #0b0b0b; color: #ececec; font-family: 'Inter', sans-serif; margin: 0; overflow: hidden; }
+        #canvas-bg { position: fixed; top: 0; left: 0; z-index: -1; width: 100%; height: 100%; opacity: 0.4; }
         
-        /* Custom Dropdown Styling */
-        .dropdown-content { display: none; position: absolute; right: 0; top: 50px; background: #0f0f0f; border: 1px solid #333; border-radius: 15px; width: 220px; max-height: 400px; overflow-y: auto; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .dropdown-item { display: flex; items-center: center; gap: 12px; padding: 12px; cursor: pointer; transition: 0.2s; border-bottom: 1px solid #1a1a1a; }
-        .dropdown-item:hover { background: #1a1a1a; }
-        .ai-logo { width: 20px; height: 20px; border-radius: 4px; object-fit: contain; }
+        /* The Arena Style Drawer */
+        #model-drawer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; backdrop-filter: blur(10px); }
+        .drawer-content { position: absolute; bottom: 0; width: 100%; max-height: 80%; background: #161616; border-top: 1px solid #333; border-radius: 30px 30px 0 0; padding: 20px; overflow-y: auto; }
+        .model-card { display: flex; items-center: center; justify-content: space-between; padding: 15px; border-bottom: 1px solid #222; cursor: pointer; transition: 0.2s; }
+        .model-card:hover { background: #222; }
+        .ai-brand-logo { width: 24px; height: 24px; border-radius: 4px; margin-right: 15px; }
+
+        /* Professional Chat */
+        .chat-container { height: calc(100vh - 160px); overflow-y: auto; padding: 20px; scrollbar-width: none; }
+        .msg-row { margin-bottom: 25px; }
+        .sender { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #666; margin-bottom: 6px; display: block; }
+        .text { font-size: 15px; line-height: 1.6; color: #ddd; max-width: 90%; }
         
-        /* Chat Interface - No Bubbles */
-        .chat-container { height: calc(100vh - 140px); overflow-y: auto; padding: 20px; scroll-behavior: smooth; }
-        .chat-row { margin-bottom: 30px; display: flex; flex-direction: column; }
-        .user-row { align-items: flex-end; }
-        .ai-row { align-items: flex-start; }
-        .msg-text { max-width: 85%; font-size: 15px; line-height: 1.6; color: #d1d5db; }
-        .sender-name { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; color: #6b7280; }
-        
-        .input-bar { background: rgba(5,5,5,0.8); backdrop-filter: blur(10px); border-top: 1px solid #222; }
+        .input-box { background: rgba(20,20,20,0.9); border-top: 1px solid #222; position: fixed; bottom: 0; w-full; }
     </style>
 </head>
 <body>
 
-    <canvas id="node-canvas"></canvas>
+    <canvas id="canvas-bg"></canvas>
 
     <!-- Header -->
-    <header class="fixed top-0 w-full p-4 flex justify-between items-center z-50 border-b border-white/5 bg-black/50 backdrop-blur-md">
+    <header class="p-4 flex justify-between items-center border-b border-white/5 bg-black/40 backdrop-blur-md sticky top-0 z-50">
         <div class="flex items-center gap-2">
-            <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-            <span class="font-bold tracking-tighter text-xl">AI<span class="text-blue-500">NODE</span></span>
+            <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+            <span class="font-bold tracking-tighter text-xl italic text-blue-400">ARENA NODE</span>
         </div>
 
-        <!-- THE CUSTOM ARROW DROPDOWN -->
-        <div class="relative">
-            <button onclick="toggleDropdown()" class="bg-[#111] border border-[#333] px-4 py-2 rounded-full flex items-center gap-3 text-xs font-bold hover:border-blue-500 transition">
-                <img id="selected-logo" src="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg" class="w-4 h-4">
-                <span id="selected-name">OPENAI (FAST)</span>
-                <i class="fas fa-chevron-down text-[10px] text-blue-500"></i>
-            </button>
-            <div id="model-list" class="dropdown-content">
-                <!-- Models will load here automatically -->
-            </div>
-        </div>
+        <!-- MODEL SELECTOR BUTTON -->
+        <button onclick="openDrawer()" class="bg-[#1a1a1a] border border-[#333] px-4 py-2 rounded-xl flex items-center gap-3 text-xs font-bold hover:border-blue-500 transition">
+            <img id="active-logo" src="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg" class="w-4 h-4">
+            <span id="active-name">gpt-5-high</span>
+            <i class="fas fa-chevron-down text-blue-500"></i>
+        </button>
     </header>
 
+    <!-- Model Selection Drawer -->
+    <div id="model-drawer" onclick="closeDrawer()">
+        <div class="drawer-content animate__animated animate__slideInUp" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="font-bold text-gray-400 text-sm uppercase tracking-widest">Top AI Models</h3>
+                <button onclick="closeDrawer()" class="text-gray-500"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div id="model-list">
+                <!-- Arena Style Models -->
+                <div class="model-card" onclick="select('gpt-5-high', 'https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg')">
+                    <div class="flex items-center"><img src="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg" class="ai-brand-logo"> <span class="font-bold">gpt-5-high</span></div>
+                    <i class="fas fa-bolt text-gray-700"></i>
+                </div>
+                <div class="model-card" onclick="select('gemini-3-pro', 'https://upload.wikimedia.org/wikipedia/commons/8/8a/Google_Gemini_logo.svg')">
+                    <div class="flex items-center"><img src="https://upload.wikimedia.org/wikipedia/commons/8/8a/Google_Gemini_logo.svg" class="ai-brand-logo"> <span class="font-bold text-blue-400">gemini-3-pro</span></div>
+                    <i class="fas fa-check-circle text-green-500"></i>
+                </div>
+                <div class="model-card" onclick="select('grok-4-reasoning', 'https://upload.wikimedia.org/wikipedia/commons/5/57/X_logo_2023_%28white%29.png')">
+                    <div class="flex items-center"><img src="https://upload.wikimedia.org/wikipedia/commons/5/57/X_logo_2023_%28white%29.png" class="ai-brand-logo"> <span class="font-bold">grok-4-fast</span></div>
+                    <i class="fas fa-brain text-purple-500"></i>
+                </div>
+                <div class="model-card" onclick="select('qwen-3-max', 'https://upload.wikimedia.org/wikipedia/commons/a/a7/Alibaba_Group_logo.svg')">
+                    <div class="flex items-center"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a7/Alibaba_Group_logo.svg" class="ai-brand-logo"> <span class="font-bold">qwen-3-omni</span></div>
+                    <i class="fas fa-microchip text-orange-500"></i>
+                </div>
+                <!-- Yahan Node apne aap aur list badhayega -->
+            </div>
+        </div>
+    </div>
+
     <!-- Chat Area -->
-    <main id="chat-box" class="chat-container mt-20 max-w-3xl mx-auto">
-        <div class="ai-row chat-row">
-            <span class="sender-name text-blue-500">System</span>
-            <div class="msg-text">Welcome, Commander. Global nodes synchronized. No API required. Start chatting with any model.</div>
+    <main id="chat-box" class="chat-container max-w-4xl mx-auto mt-4">
+        <div class="msg-row">
+            <span class="sender text-blue-500">Node System</span>
+            <div class="text">Arena Connection Established. All models unlocked. Unlimited free access active.</div>
         </div>
     </main>
 
     <!-- Input Area -->
-    <div class="input-bar fixed bottom-0 w-full p-4 md:p-6">
-        <div class="max-w-3xl mx-auto flex gap-4">
-            <input type="text" id="userInput" placeholder="Message AI Node..." class="flex-1 bg-transparent border border-[#333] p-4 rounded-xl outline-none focus:border-blue-500 text-sm">
-            <button onclick="sendMsg()" class="bg-blue-600 text-black px-6 rounded-xl font-bold hover:bg-blue-400 transition">
+    <div class="input-box fixed bottom-0 w-full p-4 md:p-6">
+        <div class="max-w-4xl mx-auto flex gap-4">
+            <input type="text" id="userInput" placeholder="Ask anything to the Node..." class="flex-1 bg-transparent border border-[#333] p-4 rounded-2xl outline-none focus:border-blue-500 text-sm">
+            <button onclick="sendMessage()" class="bg-blue-600 text-black px-8 rounded-2xl font-black hover:bg-blue-400 transition">
                 <i class="fas fa-paper-plane"></i>
             </button>
         </div>
     </div>
 
     <script>
-        // --- 1. DYNAMIC MODEL & LOGO FETCHING ---
-        const models_api = "https://text.pollinations.ai/models";
         let currentModel = "openai";
 
-        const logos = {
-            "openai": "https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg",
-            "mistral": "https://avatars.githubusercontent.com/u/144473551?s=200&v=4",
-            "llama": "https://upload.wikimedia.org/wikipedia/commons/f/ff/Meta_logo_2021.svg",
-            "searchgpt": "https://upload.wikimedia.org/wikipedia/commons/e/e1/Claude_AI_logo.svg",
-            "flux": "https://upload.wikimedia.org/wikipedia/commons/1/11/Stable_Diffusion_logo.svg"
-        };
+        function openDrawer() { document.getElementById('model-drawer').style.display = 'block'; }
+        function closeDrawer() { document.getElementById('model-drawer').style.display = 'none'; }
 
-        async function loadModels() {
-            const list = document.getElementById('model-list');
-            try {
-                const res = await fetch(models_api);
-                const models = await res.json();
-                list.innerHTML = ""; // Clear
-                
-                models.forEach(m => {
-                    const logoUrl = logos[m.name.toLowerCase()] || "https://cdn-icons-png.flaticon.com/512/2103/2103633.png";
-                    const item = document.createElement('div');
-                    item.className = "dropdown-item";
-                    item.innerHTML = `<img src="${logoUrl}" class="ai-logo"> <span class="text-xs font-bold uppercase">${m.name}</span>`;
-                    item.onclick = () => selectModel(m.name, logoUrl);
-                    list.appendChild(item);
-                });
-            } catch (e) { list.innerHTML = "<div class='p-4 text-xs'>Sync Error</div>"; }
+        function select(name, logo) {
+            currentModel = name.includes('gpt') ? 'openai' : (name.includes('gemini') ? 'gemini' : 'mistral');
+            document.getElementById('active-name').innerText = name;
+            document.getElementById('active-logo').src = logo;
+            closeDrawer();
         }
 
-        function toggleDropdown() {
-            const d = document.getElementById('model-list');
-            d.style.display = d.style.display === 'block' ? 'none' : 'block';
-        }
-
-        function selectModel(name, logo) {
-            currentModel = name;
-            document.getElementById('selected-name').innerText = name.toUpperCase();
-            document.getElementById('selected-logo').src = logo;
-            toggleDropdown();
-        }
-
-        // --- 2. CLEAN CHAT LOGIC ---
-        async function sendMsg() {
+        async function sendMessage() {
             const inp = document.getElementById('userInput');
             const chat = document.getElementById('chat-box');
             if(!inp.value) return;
 
             const text = inp.value;
             inp.value = "";
-            appendRow('User', text, true);
+            appendRow('You', text);
 
-            const aiRow = appendRow(currentModel, "Thinking...", false);
+            const aiRow = appendRow(document.getElementById('active-name').innerText, "Synchronizing nodes...");
 
             try {
+                // Asli Node Connection
                 const res = await fetch(`https://text.pollinations.ai/${encodeURIComponent(text)}?model=${currentModel}`);
                 const data = await res.text();
                 aiRow.innerText = data;
-            } catch (e) { aiRow.innerText = "Connection lost."; }
+            } catch (e) { aiRow.innerText = "Node error. Try again."; }
             chat.scrollTop = chat.scrollHeight;
         }
 
-        function appendRow(sender, text, isUser) {
+        function appendRow(sender, msg) {
             const div = document.createElement('div');
-            div.className = `chat-row ${isUser ? 'user-row' : 'ai-row'}`;
-            div.innerHTML = `<span class="sender-name ${isUser ? 'text-gray-500' : 'text-blue-500'}">${sender}</span><div class="msg-text">${text}</div>`;
+            div.className = 'msg-row';
+            div.innerHTML = `<span class="sender">${sender}</span><div class="text">${msg}</div>`;
             document.getElementById('chat-box').appendChild(div);
-            return div.querySelector('.msg-text');
+            return div.querySelector('.text');
         }
 
-        // --- 3. NODE BACKGROUND ---
-        const canvas = document.getElementById('node-canvas');
+        // --- INTERACTIVE NODE BG ---
+        const canvas = document.getElementById('canvas-bg');
         const ctx = canvas.getContext('2d');
-        let parts = [];
+        let dots = [];
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        class Part {
+        class Dot {
             constructor() {
                 this.x = Math.random()*canvas.width; this.y = Math.random()*canvas.height;
-                this.vx = Math.random()*0.6-0.3; this.vy = Math.random()*0.6-0.3;
+                this.vx = Math.random()*0.4-0.2; this.vy = Math.random()*0.4-0.2;
             }
             draw() {
                 this.x+=this.vx; this.y+=this.vy;
                 if(this.x<0||this.x>canvas.width) this.vx*=-1;
                 if(this.y<0||this.y>canvas.height) this.vy*=-1;
-                ctx.fillStyle='rgba(59,130,246,0.5)'; ctx.beginPath(); ctx.arc(this.x,this.y,1,0,Math.PI*2); ctx.fill();
+                ctx.fillStyle='rgba(59,130,246,0.3)'; ctx.beginPath(); ctx.arc(this.x,this.y,1,0,Math.PI*2); ctx.fill();
             }
         }
-        for(let i=0;i<70;i++) parts.push(new Part());
-        function anim(){
+        for(let i=0;i<80;i++) dots.push(new Dot());
+        function anim() {
             ctx.clearRect(0,0,canvas.width,canvas.height);
-            parts.forEach((p,i)=>{
-                p.draw();
-                for(let j=i;j<parts.length;j++){
-                    let d=Math.hypot(p.x-parts[j].x, p.y-parts[j].y);
-                    if(d<120){
-                        ctx.strokeStyle=`rgba(59,130,246,${0.2-d/600})`;
-                        ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(parts[j].x,parts[j].y);ctx.stroke();
+            dots.forEach((d,i)=>{
+                d.draw();
+                for(let j=i;j<dots.length;j++) {
+                    let dist = Math.hypot(d.x-dots[j].x, d.y-dots[j].y);
+                    if(dist<120) {
+                        ctx.strokeStyle=`rgba(59,130,246,${0.1 - dist/1200})`;
+                        ctx.beginPath();ctx.moveTo(d.x,d.y);ctx.lineTo(dots[j].x,dots[j].y);ctx.stroke();
                     }
                 }
             });
             requestAnimationFrame(anim);
         }
         anim();
-        loadModels();
-        window.onclick = (e) => { if(!e.target.closest('.relative')) document.getElementById('model-list').style.display='none'; }
+        document.getElementById('userInput').addEventListener('keypress',(e)=>{if(e.key==='Enter')sendMessage();});
     </script>
 </body>
 </html>
